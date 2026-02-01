@@ -2,7 +2,7 @@
 create extension if not exists vector;
 
 -- Create a table to store document embeddings
-create table documents (
+create table if not exists documents (
   id bigserial primary key,
   content text, -- The text content of the ticket or document
   metadata jsonb, -- Additional metadata (e.g., ticket_id, author)
@@ -38,5 +38,5 @@ end;
 $$;
 
 -- Create an index for faster queries (IVFFlat)
-create index on documents using ivfflat (embedding vector_cosine_ops)
+create index if not exists documents_embedding_idx on documents using ivfflat (embedding vector_cosine_ops)
 with (lists = 100);
