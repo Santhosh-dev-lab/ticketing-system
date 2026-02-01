@@ -1,26 +1,90 @@
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-btn-background: var(--btn-background);
+  --color-btn-background-hover: var(--btn-background-hover);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --animate-fade-in: fadeIn 0.5s ease-in-out forwards;
+  --animate-slide-up: slideUp 0.5s ease-out forwards;
+  --animate-slide-in-from-bottom-4: slideInFromBottom4 1s ease-out forwards;
+  --animate-slide-in-from-bottom-8: slideInFromBottom8 1s ease-out forwards 0.2s;
+  /* Added delay management via utility usually, but defining keyframes here */
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInFromBottom4 {
+    from {
+      transform: translateY(1rem);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInFromBottom8 {
+    from {
+      transform: translateY(2rem);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  --background: hsl(0 0% 100%);
+  /* White */
+  --foreground: hsl(0 0% 0%);
+  /* Black */
+  --btn-background: hsl(0 0% 0%);
+  /* Black */
+  --btn-background-hover: hsl(0 0% 20%);
+  /* Dark Gray */
+
+  --font-geist-sans: "Inter", sans-serif;
+  --font-geist-mono: "Roboto Mono", monospace;
 }
+
+/* Simple utility for animations if not using tailwindcss-animate completely */
+@utility animate-in {
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+
+/* Re-declaring standard tailwind animate utilities compatible with v4 if needed, 
+   but standard utilities should work if configured. 
+   For now, trusting standard 'animate-pulse' etc work, creating custom ones above. 
+*/
