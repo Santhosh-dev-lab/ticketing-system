@@ -42,7 +42,7 @@ export default async function Index() {
 
           <div className="flex items-center gap-4">
             {user ? (
-              <span className="text-sm text-white/60">Hey, {user.email}</span>
+              <span className="text-sm text-white/60">Hey, {user.user_metadata.full_name || user.email}</span>
             ) : (
               <Link href="/login" className="px-5 py-2 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all text-sm font-medium">
                 Log in
