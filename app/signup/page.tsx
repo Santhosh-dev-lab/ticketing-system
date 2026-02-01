@@ -149,7 +149,7 @@ function AuthContent() {
         <div className="relative w-full h-[120%] flex items-center justify-center transition-transform duration-700 ease-out group hover:scale-[1.02] translate-x-12" style={{ perspective: '1000px' }}>
           <div className="relative" style={{ transform: 'rotateY(-10deg) rotateX(5deg) scale(1.0)', transformStyle: 'preserve-3d' }}>
             <img
-              src="/dashboard.png"
+              src="/dashboard-preview.png"
               alt="Dashboard Preview"
               className="w-auto h-[100%] max-w-[125%] object-contain"
               style={{
