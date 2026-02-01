@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { signout } from '@/app/login/actions'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -42,7 +43,20 @@ export default async function Index() {
 
           <div className="flex items-center gap-4">
             {user ? (
-              <span className="text-sm text-white/60">Hey, {user.user_metadata.full_name || user.email}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-white/60">Hey, {user.user_metadata.full_name || user.email}</span>
+                <form action={signout}>
+                  <button
+                    type="submit"
+                    className="group flex p-2 rounded-full border border-white/10 bg-white/5 hover:bg-red-500/20 hover:border-red-500/50 transition-all text-white/60 hover:text-red-400"
+                    title="Log Out"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                  </button>
+                </form>
+              </div>
             ) : (
               <Link href="/login" className="px-5 py-2 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all text-sm font-medium">
                 Log in
