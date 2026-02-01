@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
         // For this implementation, we will try to find the user in the "users" table if you have a public profile table,
         // OR (Better) we use the Admin Client.
-        const serviceRoleSupabase = await createClient(true) // Using the admin flag if implemented, or we instantiate directly below.
+
 
         // Searching auth.users requires Service Role. 
         // Since we don't have a direct "search user by email" easily without admin, 
