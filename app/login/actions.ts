@@ -16,7 +16,7 @@ export async function login(formData: FormData) {
     })
 
     if (error) {
-        redirect('/login?error=Could not authenticate user')
+        redirect('/signup?error=Could not authenticate user&mode=login')
     }
 
     revalidatePath('/', 'layout')

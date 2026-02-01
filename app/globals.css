@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@plugin "tailwindcss-animate";
 
 @theme {
   --color-background: var(--background);
@@ -10,81 +9,242 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 
-  --animate-fade-in: fadeIn 0.5s ease-in-out forwards;
-  --animate-slide-up: slideUp 0.5s ease-out forwards;
-  --animate-slide-in-from-bottom-4: slideInFromBottom4 1s ease-out forwards;
-  --animate-slide-in-from-bottom-8: slideInFromBottom8 1s ease-out forwards 0.2s;
-  /* Added delay management via utility usually, but defining keyframes here */
+  --animate-fade-up: fade-up 1s ease-out forwards;
+  --animate-fade-up-delayed: fade-up 1s ease-out 0.2s forwards;
+  --animate-float: float 20s infinite ease-in-out;
 
-  @keyframes fadeIn {
+  @keyframes fade-up {
     from {
       opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideUp {
-    from {
-      transform: translateY(10px);
-      opacity: 0;
-    }
-
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideInFromBottom4 {
-    from {
-      transform: translateY(1rem);
-      opacity: 0;
-    }
-
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideInFromBottom8 {
-    from {
       transform: translateY(2rem);
-      opacity: 0;
     }
 
     to {
-      transform: translateY(0);
       opacity: 1;
+      transform: translateY(0);
     }
   }
+
+  @keyframes float {
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+
+    66% {
+      transform: translate(-20px, 20px) scale(1.05);
+    }
+
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+  }
+
+  /* 20s Complex Loop: 
+     0-9s: Interaction 1 (Top Row)
+     10-19s: Interaction 2 (Row 3 probably)
+  */
+  @keyframes cursor-complex-flow {
+    0% {
+      transform: translate(0, 0);
+    }
+
+    /* INTERACTION 1: Ticket 1 */
+    10% {
+      transform: translate(-20px, -40px);
+    }
+
+    12% {
+      transform: translate(-20px, -40px) scale(0.9);
+    }
+
+    14% {
+      transform: translate(-20px, -40px) scale(1);
+    }
+
+    /* Move to Modal 1 Accept Button */
+    25% {
+      transform: translate(60px, 85px);
+    }
+
+    30% {
+      transform: translate(60px, 85px) scale(0.9);
+    }
+
+    32% {
+      transform: translate(60px, 85px) scale(1);
+    }
+
+    /* Reset / Transition */
+    40% {
+      transform: translate(10px, 10px);
+    }
+
+    /* INTERACTION 2: Ticket 2 (Moved Up Closer) */
+    /* Reduced gap: previously starts much lower, now -10px relative start */
+    50% {
+      transform: translate(-15px, -10px);
+    }
+
+    52% {
+      transform: translate(-15px, -10px) scale(0.9);
+    }
+
+    54% {
+      transform: translate(-15px, -10px) scale(1);
+    }
+
+    /* Move to Modal 2 Accept Button (Relative to start) */
+    65% {
+      transform: translate(60px, 135px);
+    }
+
+    70% {
+      transform: translate(60px, 135px) scale(0.9);
+    }
+
+    72% {
+      transform: translate(60px, 135px) scale(1);
+    }
+
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+
+  @keyframes modal-pop-1 {
+
+    0%,
+    10% {
+      opacity: 0;
+      transform: scale(0.8) translateY(10px);
+      pointer-events: none;
+    }
+
+    15%,
+    35% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+
+    40%,
+    100% {
+      opacity: 0;
+      transform: scale(0.8) translateY(10px);
+      pointer-events: none;
+    }
+  }
+
+  @keyframes modal-pop-2 {
+
+    0%,
+    50% {
+      opacity: 0;
+      transform: scale(0.8) translateY(10px);
+      pointer-events: none;
+    }
+
+    55%,
+    75% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+
+    80%,
+    100% {
+      opacity: 0;
+      transform: scale(0.8) translateY(10px);
+      pointer-events: none;
+    }
+  }
+
+  @keyframes ripple-fire {
+    0% {
+      transform: scale(0);
+      opacity: 0.8;
+    }
+
+    100% {
+      transform: scale(3);
+      opacity: 0;
+    }
+  }
+
+  @keyframes btn-press-accept {
+
+    0%,
+    25% {
+      transform: scale(1);
+      filter: brightness(1);
+    }
+
+    30%,
+    32% {
+      transform: scale(0.92);
+      filter: brightness(1.2);
+    }
+
+    /* Click 1 */
+    35%,
+    65% {
+      transform: scale(1);
+      filter: brightness(1);
+    }
+
+    70%,
+    72% {
+      transform: scale(0.92);
+      filter: brightness(1.2);
+    }
+
+    /* Click 2 */
+    75%,
+    100% {
+      transform: scale(1);
+      filter: brightness(1);
+    }
+  }
+
+  /* 12s Complex Loop - Faster Layout */
+  --animate-cursor-complex: cursor-complex-flow 12s infinite ease-in-out;
+  --animate-modal-1: modal-pop-1 12s infinite cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-modal-2: modal-pop-2 12s infinite cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-btn-accept: btn-press-accept 12s infinite linear;
+
+  --animate-ripple-1: ripple-fire 12s infinite linear;
+  --animate-ripple-2: ripple-fire 12s infinite linear;
+  --animate-ripple-3: ripple-fire 12s infinite linear;
+  --animate-ripple-4: ripple-fire 12s infinite linear;
 }
 
 :root {
-  --background: hsl(0 0% 100%);
+  --background: hsl(0 0% 0%);
+  /* Black */
+  --foreground: hsl(0 0% 100%);
   /* White */
-  --foreground: hsl(0 0% 0%);
-  /* Black */
-  --btn-background: hsl(0 0% 0%);
-  /* Black */
-  --btn-background-hover: hsl(0 0% 20%);
-  /* Dark Gray */
+  --btn-background: hsl(0 0% 100%);
+  /* White Button */
+  --btn-background-hover: hsl(0 0% 90%);
 
   --font-geist-sans: "Inter", sans-serif;
   --font-geist-mono: "Roboto Mono", monospace;
 }
 
-/* Simple utility for animations if not using tailwindcss-animate completely */
-@utility animate-in {
-  animation-duration: 1s;
-  animation-fill-mode: forwards;
-  opacity: 0;
+body {
+  @apply bg-background text-foreground antialiased selection:bg-white/20;
+  font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-/* Re-declaring standard tailwind animate utilities compatible with v4 if needed, 
-   but standard utilities should work if configured. 
-   For now, trusting standard 'animate-pulse' etc work, creating custom ones above. 
-*/
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply tracking-tight font-bold;
+}

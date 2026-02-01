@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import Image from 'next/image'
 
 export default async function Index() {
   const supabase = await createClient()
@@ -10,73 +10,89 @@ export default async function Index() {
   } = await supabase.auth.getUser()
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-20 items-center justify-center min-h-screen bg-gray-50">
-      <nav className="w-full flex justify-center border-b border-gray-200 h-16 bg-white/80 backdrop-blur-md fixed top-0 z-50">
-        <div className="w-full max-w-5xl flex justify-between items-center p-4 text-sm">
-          <div className="font-bold text-xl tracking-tighter flex items-center gap-2">
-            TicketSys_
+    <div className="flex min-h-screen flex-col bg-black text-white overflow-hidden relative selection:bg-white/20">
+
+      {/* Background with Blur & Animation */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 animate-float scale-[1.02]">
+          <img
+            src="/background1.png"
+            alt="Background"
+            className="w-full h-full object-cover object-center opacity-80"
+          />
+        </div>
+        {/* Gradient Overlay for Fade out */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black z-10" />
+      </div>
+
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center p-6 bg-transparent">
+        <div className="w-full max-w-6xl flex items-center justify-between">
+          <div className="flex items-center gap-2 font-bold text-xl tracking-tighter cursor-pointer">
+            <span className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-black text-xs">S</span>
+            SupportFlow
           </div>
-          <div className="flex gap-4 items-center">
+
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-white/70">
+            <Link href="#" className="hover:text-white transition-colors">Features</Link>
+            <Link href="#" className="hover:text-white transition-colors">Pricing</Link>
+            <Link href="#" className="hover:text-white transition-colors">Docs</Link>
+            <Link href="#" className="hover:text-white transition-colors">Contact</Link>
+          </div>
+
+          <div className="flex items-center gap-4">
             {user ? (
-              <div className="flex items-center gap-4">
-                <span className="text-gray-600">Hey, {user.email}</span>
-                <form action="/auth/signout" method="post">
-                  <button className="py-2 px-4 rounded-full border border-gray-200 hover:bg-black hover:text-white transition-all text-xs uppercase tracking-wider font-medium">
-                    Logout
-                  </button>
-                </form>
-              </div>
+              <span className="text-sm text-white/60">Hey, {user.email}</span>
             ) : (
-              <>
-                <Link href="/login" className="font-medium hover:text-gray-600 transition-colors">Login</Link>
-                <Link href="/signup" className="py-2 px-6 rounded-full bg-black text-white hover:bg-gray-800 transition-all font-medium text-xs uppercase tracking-wider">
-                  Get Started
-                </Link>
-              </>
+              <Link href="/login" className="px-5 py-2 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all text-sm font-medium">
+                Log in
+              </Link>
             )}
+            <Link href={user ? "#" : "/signup"} className="px-5 py-2 rounded-full bg-white text-black hover:bg-gray-200 transition-all text-sm font-medium">
+              Get started
+            </Link>
           </div>
         </div>
       </nav>
 
-      <main className="flex-1 flex flex-col gap-8 items-center justify-center px-4 text-center mt-32 max-w-4xl mx-auto">
-        <h1 className="font-bold text-7xl lg:text-8xl tracking-tighter text-black animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          Support.<br />Made Simple.
-        </h1>
-        <p className="text-xl text-gray-500 max-w-2xl mx-auto font-light animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-          The fastest way to manage customer inquiries and drive satisfaction.
-          Powerful, intuitive, and built for modern teams.
-        </p>
-        {!user && (
-          <div className="flex gap-4 mt-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
-            <Link href="/signup" className="px-10 py-4 rounded-full bg-black text-white font-medium text-lg hover:bg-gray-800 transition-all hover:scale-105 shadow-xl hover:shadow-2xl">
-              Start for Free
-            </Link>
-          </div>
-        )}
-      </main>
+      {/* Hero Content */}
+      <main className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 text-center mt-20">
 
-      <footer className="w-full border-t border-t-foreground/10 p-8 flex justify-center text-center text-xs text-gray-500">
-        <p>
-          Powered by{' '}
-          <a
-            href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-            target="_blank"
-            className="font-bold hover:underline"
-            rel="noreferrer"
-          >
-            Supabase
-          </a>
-          {' '}&{' '}
-          <a
-            href="https://nextjs.org/"
-            target="_blank"
-            className="font-bold hover:underline"
-            rel="noreferrer"
-          >
-            Next.js
-          </a>
+        {/* Pill Label */}
+        <div className="mb-8 animate-fade-up opacity-0" style={{ animationDelay: '0.1s' }}>
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs font-medium text-white/80">
+            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+            Now powering 10,000+ support teams
+          </span>
+        </div>
+
+        <h1 className="max-w-4xl text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6 leading-tight animate-fade-up opacity-0" style={{ animationDelay: '0.2s' }}>
+          Customer support <br className="hidden md:block" />
+          that <span className="italic font-serif font-light text-white/90">feels</span> human.
+        </h1>
+
+        <p className="max-w-xl text-lg md:text-xl text-white/60 mb-10 leading-relaxed animate-fade-up opacity-0" style={{ animationDelay: '0.4s' }}>
+          Automate inquiries, organize tickets, and delight customers with an AI-first support platform designed for speed.
         </p>
-      </footer>
+
+        <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-up opacity-0" style={{ animationDelay: '0.6s' }}>
+          <Link
+            href="/signup"
+            className="h-12 px-8 rounded-full bg-white text-black font-semibold flex items-center justify-center hover:bg-gray-200 transition-all hover:scale-105"
+          >
+            Get started
+          </Link>
+          <Link
+            href="#"
+            className="h-12 px-8 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-white font-medium flex items-center justify-center hover:bg-white/10 transition-all"
+          >
+            Learn more
+          </Link>
+        </div>
+
+
+
+      </main>
     </div>
   )
 }
