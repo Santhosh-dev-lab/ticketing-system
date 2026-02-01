@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
+import Features from '@/components/Features'
 
 export default async function Index() {
   const supabase = await createClient()
@@ -56,41 +57,45 @@ export default async function Index() {
       </nav>
 
       {/* Hero Content */}
-      <main className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 text-center mt-20">
+      <main className="relative z-20 flex-1 flex flex-col w-full">
+        {/* Hero Section */}
+        <section className="flex flex-col items-center justify-center min-h-screen px-4 text-center pt-20 pb-10">
 
-        {/* Pill Label */}
-        <div className="mb-8 animate-fade-up opacity-0" style={{ animationDelay: '0.1s' }}>
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs font-medium text-white/80">
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-            Now powering 10,000+ support teams
-          </span>
-        </div>
+          {/* Pill Label */}
+          <div className="mb-8 animate-fade-up opacity-0" style={{ animationDelay: '0.1s' }}>
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs font-medium text-white/80">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+              Now powering 10,000+ support teams
+            </span>
+          </div>
 
-        <h1 className="max-w-4xl text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6 leading-tight animate-fade-up opacity-0" style={{ animationDelay: '0.2s' }}>
-          Customer support <br className="hidden md:block" />
-          that <span className="italic font-serif font-light text-white/90">feels</span> human.
-        </h1>
+          <h1 className="max-w-4xl text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6 leading-tight animate-fade-up opacity-0" style={{ animationDelay: '0.2s' }}>
+            Customer support <br className="hidden md:block" />
+            that <span className="italic font-serif font-light text-white/90">feels</span> human.
+          </h1>
 
-        <p className="max-w-xl text-lg md:text-xl text-white/60 mb-10 leading-relaxed animate-fade-up opacity-0" style={{ animationDelay: '0.4s' }}>
-          Automate inquiries, organize tickets, and delight customers with an AI-first support platform designed for speed.
-        </p>
+          <p className="max-w-xl text-lg md:text-xl text-white/60 mb-10 leading-relaxed animate-fade-up opacity-0" style={{ animationDelay: '0.4s' }}>
+            Automate inquiries, organize tickets, and delight customers with an AI-first support platform designed for speed.
+          </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-up opacity-0" style={{ animationDelay: '0.6s' }}>
-          <Link
-            href="/signup"
-            className="h-12 px-8 rounded-full bg-white text-black font-semibold flex items-center justify-center hover:bg-gray-200 transition-all hover:scale-105"
-          >
-            Get started
-          </Link>
-          <Link
-            href="#"
-            className="h-12 px-8 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-white font-medium flex items-center justify-center hover:bg-white/10 transition-all"
-          >
-            Learn more
-          </Link>
-        </div>
+          <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-up opacity-0" style={{ animationDelay: '0.6s' }}>
+            <Link
+              href="/signup"
+              className="h-12 px-8 rounded-full bg-white text-black font-semibold flex items-center justify-center hover:bg-gray-200 transition-all hover:scale-105"
+            >
+              Get started
+            </Link>
+            <Link
+              href="#"
+              className="h-12 px-8 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-white font-medium flex items-center justify-center hover:bg-white/10 transition-all"
+            >
+              Learn more
+            </Link>
+          </div>
+        </section>
 
-
+        {/* Features Section */}
+        <Features />
 
       </main>
     </div>
