@@ -19,36 +19,66 @@ import {
     Linkedin,
     type LucideIcon
 } from 'lucide-react'
+import { DrawOnScrollIcon } from "./DrawOnScrollIcon";
+import { iconPaths } from "./iconPaths";
 
 const features = [
     {
         icon: Mail,
+        paths: iconPaths.mail,
         title: 'Email to Ticket',
         description: 'Convert customer emails into tickets automatically.'
     },
     {
         icon: BarChart3,
+        paths: iconPaths.reporting,
         title: 'Reporting',
         description: 'Track performance and bottlenecks with built-in reports.'
     },
     {
         icon: MessageCircle,
+        paths: iconPaths.social,
         title: 'Social Desk',
         description: 'Manage social Support interactions from one place.',
-        extraIcons: [Facebook, Twitter, Linkedin]
+        extraIcons: [
+            // Facebook
+            {
+                paths: ["M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"],
+                viewBox: "0 0 24 24"
+            },
+            // X (Twitter)
+            {
+                paths: ["M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zl-1.161 17.52h1.833L7.084 4.126H5.117z"],
+                viewBox: "0 0 24 24",
+                fillAfterDraw: false, // Outline only
+                strokeWidth: 1 // Thinner stroke for clear outline
+            },
+            // LinkedIn
+            {
+                paths: [
+                    "M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z",
+                    "M2 9h4v12H2z",
+                    "M4 2a2 2 0 1 1-1.44 2.36A2 2 0 0 1 4 2z"
+                ],
+                viewBox: "0 0 24 24"
+            }
+        ]
     },
     {
         icon: Zap,
+        paths: iconPaths.automation,
         title: 'Automation',
         description: 'Automate assignments and eliminate repetitive chores.'
     },
     {
         icon: Puzzle,
+        paths: iconPaths.integrations,
         title: 'Integrations',
         description: 'Connect payment, translation, and other tools easily.'
     },
     {
         icon: Book,
+        paths: iconPaths.knowledge,
         title: 'Knowledge Base',
         description: 'Empower customers with a self-service help center.'
     }
@@ -129,8 +159,12 @@ const TiltCard = ({ feature }: { feature: any }) => {
                 }}
                 className="absolute inset-px grid place-content-center rounded-xl bg-gradient-to-br from-white/5 to-transparent backdrop-blur-md shadow-2xl p-6 text-center border border-white/20"
             >
-                <div style={{ transform: "translateZ(75px)" }} className="mx-auto mb-4 p-3 rounded-full bg-white/10 text-white">
-                    <Icon size={32} />
+                <div style={{ transform: "translateZ(75px)" }} className="mx-auto mb-4 p-3 rounded-full bg-white/10 text-white w-14 h-14 flex items-center justify-center">
+                    {feature.paths ? (
+                        <DrawOnScrollIcon paths={feature.paths} viewBox="0 0 24 24" />
+                    ) : (
+                        <Icon size={32} />
+                    )}
                 </div>
 
                 <h3
@@ -149,11 +183,26 @@ const TiltCard = ({ feature }: { feature: any }) => {
 
                 {feature.extraIcons && (
                     <div style={{ transform: "translateZ(50px)" }} className="flex gap-3 justify-center mt-4">
-                        {feature.extraIcons.map((Icon: LucideIcon, i: number) => (
-                            <div key={i} className="text-zinc-500 hover:text-white transition-colors">
-                                <Icon size={16} />
-                            </div>
-                        ))}
+                        {feature.extraIcons.map((item: any, i: number) => {
+                            if (item.paths) {
+                                return (
+                                    <div key={i} className="text-zinc-500 hover:text-white transition-colors w-5 h-5">
+                                        <DrawOnScrollIcon
+                                            paths={item.paths}
+                                            viewBox={item.viewBox}
+                                            fillAfterDraw={item.fillAfterDraw}
+                                            strokeWidth={item.strokeWidth}
+                                        />
+                                    </div>
+                                )
+                            }
+                            const Icon = item as LucideIcon;
+                            return (
+                                <div key={i} className="text-zinc-500 hover:text-white transition-colors">
+                                    <Icon size={16} />
+                                </div>
+                            )
+                        })}
                     </div>
                 )}
             </div>
