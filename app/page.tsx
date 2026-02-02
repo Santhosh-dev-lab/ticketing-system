@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Features from '@/components/Features'
 import MissionStatement from '@/components/MissionStatement'
+import StickyScroll from '@/components/StickyScroll'
 
 export default async function Index() {
   const supabase = await createClient()
@@ -114,6 +115,9 @@ export default async function Index() {
 
         {/* Mission Statement */}
         <MissionStatement />
+
+        {/* Sticky Scroll Features */}
+        <StickyScroll />
 
         {/* Features Section - Defaults to black bg (from parent) */}
         <Features />
