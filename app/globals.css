@@ -220,6 +220,18 @@
   --animate-ripple-2: ripple-fire 12s infinite linear;
   --animate-ripple-3: ripple-fire 12s infinite linear;
   --animate-ripple-4: ripple-fire 12s infinite linear;
+
+  --animate-slow-pan: slow-pan 30s infinite alternate ease-in-out;
+
+  @keyframes slow-pan {
+    0% {
+      transform: translateX(0%);
+    }
+
+    100% {
+      transform: translateX(-10%);
+    }
+  }
 }
 
 :root {

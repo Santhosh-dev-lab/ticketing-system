@@ -3,6 +3,7 @@ import { signout } from '@/app/login/actions'
 import Link from 'next/link'
 import Image from 'next/image'
 import Features from '@/components/Features'
+import HeroBackground from '@/components/HeroBackground'
 
 export default async function Index() {
   const supabase = await createClient()
@@ -14,18 +15,7 @@ export default async function Index() {
   return (
     <div className="flex min-h-screen flex-col bg-black text-white overflow-hidden relative selection:bg-white/20">
 
-      {/* Background with Blur & Animation */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 animate-float scale-[1.02]">
-          <img
-            src="/background1.png"
-            alt="Background"
-            className="w-full h-full object-cover object-center opacity-80"
-          />
-        </div>
-        {/* Gradient Overlay for Fade out */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black z-10" />
-      </div>
+
 
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center p-6 bg-transparent">
@@ -73,7 +63,21 @@ export default async function Index() {
       {/* Hero Content */}
       <main className="relative z-20 flex-1 flex flex-col w-full">
         {/* Hero Section */}
-        <section className="flex flex-col items-center justify-center min-h-screen px-4 text-center pt-20 pb-10">
+        <section className="relative overflow-hidden flex flex-col items-center justify-center min-h-screen px-4 text-center pt-20 pb-10">
+          {/* Background Image - Hero Only */}
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            {/* Animated Container - Oversized to prevent gaps */}
+            <div className="absolute -top-[10%] -left-[10%] w-[120%] h-[120%] animate-slow-pan">
+              <Image
+                src="/background1.png"
+                alt="Background"
+                fill
+                className="object-cover object-center opacity-80"
+                priority
+              />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-10" />
+          </div>
 
           {/* Pill Label */}
           <div className="mb-8 animate-fade-up opacity-0" style={{ animationDelay: '0.1s' }}>
