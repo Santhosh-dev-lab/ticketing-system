@@ -28,7 +28,7 @@ export const DrawOnScrollIcon = ({
                 xmlns="http://www.w3.org/2000/svg"
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-10%" }}
+                viewport={{ once: false, margin: "-10%" }}
             >
                 {paths.map((d, i) => (
                     <motion.path
