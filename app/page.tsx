@@ -3,6 +3,7 @@ import { signout } from '@/app/login/actions'
 import Link from 'next/link'
 import Image from 'next/image'
 import Features from '@/components/Features'
+import MissionStatement from '@/components/MissionStatement'
 
 export default async function Index() {
   const supabase = await createClient()
@@ -110,6 +111,9 @@ export default async function Index() {
             </Link>
           </div>
         </section>
+
+        {/* Mission Statement */}
+        <MissionStatement />
 
         {/* Features Section - Defaults to black bg (from parent) */}
         <Features />
