@@ -54,9 +54,25 @@ export async function signInWithGoogle() {
     const supabase = await createClient()
 
     // Get the base URL ensuring it's correct for both local and prod
-    // In strict mode or production, use the environment variable
-    // In local development, fallback to localhost:3000 if not set
-    const origin = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    // 1. Explicitly set BASE_URL (Best practice)
+    // 2. Vercel Production URL (Auto-set by Vercel)
+    // 3. Vercel Preview URL (Auto-set by Vercel)
+    // 4. Localhost fallback
+    const getURL = () => {
+        let url =
+            process.env.NEXT_PUBLIC_BASE_URL ?? // Set this to your site URL in production env.
+            process.env.VERCEL_URL ?? // Automatically set by Vercel (Server Side).
+            process.env.NEXT_PUBLIC_VERCEL_URL ?? // Client side fallback.
+            'http://localhost:3000/'
+
+        // Make sure to include `https://` when not localhost.
+        url = url.includes('http') ? url : `https://${url}`
+        // Remove trailing slash if present
+        url = url.replace(/\/$/, '')
+        return url
+    }
+
+    const origin = getURL()
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
