@@ -3,7 +3,6 @@ import { signout } from '@/app/login/actions'
 import Link from 'next/link'
 import Image from 'next/image'
 import Features from '@/components/Features'
-import HeroBackground from '@/components/HeroBackground'
 
 export default async function Index() {
   const supabase = await createClient()
@@ -13,9 +12,7 @@ export default async function Index() {
   } = await supabase.auth.getUser()
 
   return (
-    <div className="flex min-h-screen flex-col bg-black text-white overflow-hidden relative selection:bg-white/20">
-
-
+    <div className="flex min-h-screen flex-col bg-black text-white selection:bg-white/20">
 
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center p-6 bg-transparent">
@@ -64,6 +61,7 @@ export default async function Index() {
       <main className="relative z-20 flex-1 flex flex-col w-full">
         {/* Hero Section */}
         <section className="relative overflow-hidden flex flex-col items-center justify-center min-h-screen px-4 text-center pt-20 pb-10">
+
           {/* Background Image - Hero Only */}
           <div className="absolute inset-0 z-0 pointer-events-none">
             {/* Animated Container - Oversized to prevent gaps */}
@@ -76,27 +74,28 @@ export default async function Index() {
                 priority
               />
             </div>
+            {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-10" />
           </div>
 
           {/* Pill Label */}
-          <div className="mb-8 animate-fade-up opacity-0" style={{ animationDelay: '0.1s' }}>
+          <div className="relative z-20 mb-8 animate-fade-up opacity-0" style={{ animationDelay: '0.1s' }}>
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs font-medium text-white/80">
               <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
               Now powering 10,000+ support teams
             </span>
           </div>
 
-          <h1 className="max-w-4xl text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6 leading-tight animate-fade-up opacity-0" style={{ animationDelay: '0.2s' }}>
+          <h1 className="relative z-20 max-w-4xl text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6 leading-tight animate-fade-up opacity-0" style={{ animationDelay: '0.2s' }}>
             Customer support <br className="hidden md:block" />
             that <span className="italic font-serif font-light text-white/90">feels</span> human.
           </h1>
 
-          <p className="max-w-xl text-lg md:text-xl text-white/60 mb-10 leading-relaxed animate-fade-up opacity-0" style={{ animationDelay: '0.4s' }}>
+          <p className="relative z-20 max-w-xl text-lg md:text-xl text-white/60 mb-10 leading-relaxed animate-fade-up opacity-0" style={{ animationDelay: '0.4s' }}>
             Automate inquiries, organize tickets, and delight customers with an AI-first support platform designed for speed.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-up opacity-0" style={{ animationDelay: '0.6s' }}>
+          <div className="relative z-20 flex flex-col sm:flex-row items-center gap-4 animate-fade-up opacity-0" style={{ animationDelay: '0.6s' }}>
             <Link
               href="/signup"
               className="h-12 px-8 rounded-full bg-white text-black font-semibold flex items-center justify-center hover:bg-gray-200 transition-all hover:scale-105"
@@ -112,7 +111,7 @@ export default async function Index() {
           </div>
         </section>
 
-        {/* Features Section */}
+        {/* Features Section - Defaults to black bg (from parent) */}
         <Features />
 
       </main>
