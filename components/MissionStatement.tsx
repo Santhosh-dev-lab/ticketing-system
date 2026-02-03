@@ -3,9 +3,9 @@
 import { useScroll, useTransform, motion, MotionValue } from 'framer-motion';
 import React, { useRef } from 'react';
 
-const paragraph1 = "Your inbox 📨 shouldn't be a black hole. It should be a command center 🕹️ designed for action.";
-const paragraph2 = "We unify emails, chats, and tweets into one powerful stream 🌊, powered by AI that actually helps you solve problems.";
-const paragraph3 = "Resolution at the speed of thought ⚡. Give your team the tool they'll actually love using ❤️.";
+const paragraph1 = "Turn every customer signal—voice, chat, or email—into a structured, actionable ticket. No data lost, no context missing.";
+const paragraph2 = "Empower your agents with a smart copilot. AI that drafts answers, prioritizes urgency, and automates resolution instantly.";
+const paragraph3 = "Support that scales with your ambition. Deliver human-quality care at machine speed, resolving issues before they escalate.";
 
 export default function MissionStatement() {
     const container = useRef<HTMLElement>(null);
