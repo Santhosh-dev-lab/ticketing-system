@@ -3,7 +3,7 @@
 import { useScroll, useTransform, motion, MotionValue } from 'framer-motion';
 import React, { useRef } from 'react';
 
-const paragraph1 = "Turn every customer signal—voice, chat, or email—into a structured, actionable ticket. No data lost, no context missing.";
+const paragraph1 = "Turn every customer signal 2 voice, chat, or email into a structured, actionable ticket. No data lost, no context missing.";
 const paragraph2 = "Empower your agents with a smart copilot. AI that drafts answers, prioritizes urgency, and automates resolution instantly.";
 const paragraph3 = "Support that scales with your ambition. Deliver human-quality care at machine speed, resolving issues before they escalate.";
 
