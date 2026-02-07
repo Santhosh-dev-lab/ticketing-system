@@ -5,6 +5,8 @@ import Image from 'next/image'
 import Features from '@/components/Features'
 import MissionStatement from '@/components/MissionStatement'
 import StickyScroll from '@/components/StickyScroll'
+import FAQs from '@/components/FAQs'
+import Footer from '@/components/Footer'
 
 export default async function Index() {
   const supabase = await createClient()
@@ -121,6 +123,12 @@ export default async function Index() {
 
         {/* Features Section - Defaults to black bg (from parent) */}
         <Features />
+
+        {/* FAQs Section */}
+        <FAQs />
+
+        {/* Footer */}
+        <Footer />
 
       </main>
     </div>
