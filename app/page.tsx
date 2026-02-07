@@ -7,6 +7,7 @@ import MissionStatement from '@/components/MissionStatement'
 import StickyScroll from '@/components/StickyScroll'
 import FAQs from '@/components/FAQs'
 import Footer from '@/components/Footer'
+import LogoutButton from '@/components/LogoutButton'
 
 export default async function Index() {
   const supabase = await createClient()
@@ -27,10 +28,10 @@ export default async function Index() {
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-white/70">
-            <Link href="#" className="hover:text-white transition-colors">Features</Link>
-            <Link href="#" className="hover:text-white transition-colors">Pricing</Link>
-            <Link href="#" className="hover:text-white transition-colors">Docs</Link>
-            <Link href="#" className="hover:text-white transition-colors">Contact</Link>
+            <Link href="#features" className="hover:text-white transition-colors">Features</Link>
+            <Link href="#features" className="hover:text-white transition-colors">Pricing</Link>
+            <Link href="#faqs" className="hover:text-white transition-colors">Docs</Link>
+            <Link href="#footer" className="hover:text-white transition-colors">Contact</Link>
           </div>
 
           <div className="flex items-center gap-4">
@@ -38,15 +39,7 @@ export default async function Index() {
               <div className="flex items-center gap-3">
                 <span className="text-sm text-white/60">Hey, {user.user_metadata.full_name || user.email}</span>
                 <form action={signout}>
-                  <button
-                    type="submit"
-                    className="group flex p-2 rounded-full border border-white/10 bg-white/5 hover:bg-red-500/20 hover:border-red-500/50 transition-all text-white/60 hover:text-red-400"
-                    title="Log Out"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                  </button>
+                  <LogoutButton />
                 </form>
               </div>
             ) : (
