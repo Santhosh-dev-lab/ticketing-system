@@ -86,7 +86,7 @@ const features = [
 
 export default function Features() {
     return (
-        <section className="container mx-auto px-4 py-32 mt-20 relative z-20">
+        <section id="features" className="container mx-auto px-4 py-32 mt-20 relative z-20">
             <div className="text-center mb-16 animate-fade-up" style={{ animationDelay: '0.2s' }}>
                 <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
                     Feature rich helpdesk at $0

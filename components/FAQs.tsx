@@ -29,7 +29,7 @@ const faqs = [
 
 export default function FAQs() {
     return (
-        <section className="container mx-auto px-4 py-24 relative z-20">
+        <section id="faqs" className="container mx-auto px-4 py-24 relative z-20">
             <div className="text-center mb-16 animate-fade-up">
                 <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
                     We’ve got answers

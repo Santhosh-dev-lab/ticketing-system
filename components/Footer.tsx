@@ -7,7 +7,7 @@ import { Twitter, Linkedin, Youtube, Instagram } from 'lucide-react';
 
 export default function Footer() {
     return (
-        <footer className="relative w-full bg-black pt-20 pb-10 overflow-hidden text-white/80">
+        <footer id="footer" className="relative w-full bg-black pt-20 pb-10 overflow-hidden text-white/80">
 
             {/* CTA Section */}
             <div className="relative w-full max-w-6xl mx-auto px-6 mb-32">
