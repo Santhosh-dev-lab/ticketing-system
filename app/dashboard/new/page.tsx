@@ -16,9 +16,32 @@ export default function NewTicketPage() {
     const [state, formAction, isPending] = useActionState(createTicket, initialState)
 
     return (
-        <div className="h-[calc(100vh-2rem)] flex flex-col justify-center max-w-6xl mx-auto">
+        <div className="h-[calc(100vh-2rem)] flex flex-col justify-center max-w-6xl mx-auto relative">
+            {/* Global Background Pattern */}
+            <div className="fixed inset-0 z-0 opacity-[0.12] pointer-events-none overflow-hidden">
+                <svg className="absolute w-full h-full" width="100%" height="100%">
+                    <pattern id="global-ticket-pattern" x="0" y="0" width="140" height="140" patternUnits="userSpaceOnUse" patternTransform="translate(0,0)">
+                        <animateTransform attributeName="patternTransform" type="translate" from="0 0" to="0 -140" dur="20s" repeatCount="indefinite" />
+                        {/* Ticket Body */}
+                        <path d="M20 40 H80 A5 5 0 0 1 85 45 V55 A5 5 0 0 0 85 65 V75 A5 5 0 0 1 80 80 H20 A5 5 0 0 1 15 75 V65 A5 5 0 0 0 15 55 V45 A5 5 0 0 1 20 40 Z" fill="none" stroke="currentColor" strokeWidth="0.8" className="text-white" />
+                        {/* Perforation Line */}
+                        <path d="M35 40 V80" fill="none" stroke="currentColor" strokeWidth="0.8" strokeDasharray="3 3" className="text-white" />
+                        {/* Content Lines */}
+                        <path d="M45 50 H75 M45 60 H70 M45 70 H65" fill="none" stroke="currentColor" strokeWidth="0.8" className="text-white" />
+                        {/* Gear Icon - Top Right Overlay */}
+                        <g transform="translate(75, 30) scale(0.6)">
+                            <path d="M15 10 A5 5 0 0 0 10 15 L8 15 L7 12 A10 10 0 0 0 3 14 L4 17 L2 20 L0 18 A10 10 0 0 0 0 22 L3 24 L3 27 L0 29 A10 10 0 0 0 2 33 L5 31 L8 34 L8 37 A5 5 0 0 0 10 42 L20 42 A5 5 0 0 0 22 37 L22 34 L25 31 L28 33 A10 10 0 0 0 30 29 L27 27 L27 24 L30 22 A10 10 0 0 0 28 18 L26 20 L24 17 L25 14 A10 10 0 0 0 21 12 L20 15 L18 15 A5 5 0 0 0 15 10 Z" fill="#1A1D24" stroke="currentColor" strokeWidth="2" className="text-white" />
+                            <circle cx="15" cy="26" r="4" fill="none" stroke="currentColor" strokeWidth="2" className="text-white" />
+                        </g>
+                    </pattern>
+                    <rect width="100%" height="100%" fill="url(#global-ticket-pattern)" />
+                </svg>
+                {/* Radial Fade for seamless blend */}
+                <div className="absolute inset-0 bg-gradient-to-t from-transparent via-[#0B0E14]/40 to-[#0B0E14]"></div>
+            </div>
+
             {/* Header */}
-            <div className="mb-6 flex items-center justify-between px-2 shrink-0">
+            <div className="mb-6 flex items-center justify-between px-2 shrink-0 relative z-10">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-white mb-1">Submit a Support Ticket</h1>
                     <p className="text-white/40 text-xs font-medium">We represent the best of the company. Let us know how we can help.</p>
@@ -35,8 +58,12 @@ export default function NewTicketPage() {
             <div className="bg-[#1A1D24] border border-white/5 rounded-[32px] shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 grow max-h-[600px]">
 
                 {/* Left Column: Form */}
-                <div className="p-8 relative z-10 flex flex-col justify-center bg-[#1A1D24] h-full overflow-y-auto">
-                    <form action={formAction} className="space-y-6">
+                <div className="p-8 relative z-10 flex flex-col justify-center bg-[#1A1D24] h-full overflow-hidden">
+                    {/* Background Doodle Pattern Removed */}
+                    {/* Gradient Fade Overlay */}
+                    <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#1A1D24] via-[#1A1D24]/40 to-transparent pointer-events-none"></div>
+
+                    <form action={formAction} className="space-y-6 relative z-10">
                         {state?.error && (
                             <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
                                 <svg className="w-4 h-4 text-red-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
