@@ -20,19 +20,31 @@ export default function NewTicketPage() {
             {/* Global Background Pattern */}
             <div className="fixed inset-0 z-0 opacity-[0.12] pointer-events-none overflow-hidden">
                 <svg className="absolute w-full h-full" width="100%" height="100%">
-                    <pattern id="global-ticket-pattern" x="0" y="0" width="140" height="140" patternUnits="userSpaceOnUse" patternTransform="translate(0,0)">
-                        <animateTransform attributeName="patternTransform" type="translate" from="0 0" to="0 -140" dur="20s" repeatCount="indefinite" />
-                        {/* Ticket Body */}
-                        <path d="M20 40 H80 A5 5 0 0 1 85 45 V55 A5 5 0 0 0 85 65 V75 A5 5 0 0 1 80 80 H20 A5 5 0 0 1 15 75 V65 A5 5 0 0 0 15 55 V45 A5 5 0 0 1 20 40 Z" fill="none" stroke="currentColor" strokeWidth="0.8" className="text-white" />
-                        {/* Perforation Line */}
-                        <path d="M35 40 V80" fill="none" stroke="currentColor" strokeWidth="0.8" strokeDasharray="3 3" className="text-white" />
-                        {/* Content Lines */}
-                        <path d="M45 50 H75 M45 60 H70 M45 70 H65" fill="none" stroke="currentColor" strokeWidth="0.8" className="text-white" />
-                        {/* Gear Icon - Top Right Overlay */}
-                        <g transform="translate(75, 30) scale(0.6)">
-                            <path d="M15 10 A5 5 0 0 0 10 15 L8 15 L7 12 A10 10 0 0 0 3 14 L4 17 L2 20 L0 18 A10 10 0 0 0 0 22 L3 24 L3 27 L0 29 A10 10 0 0 0 2 33 L5 31 L8 34 L8 37 A5 5 0 0 0 10 42 L20 42 A5 5 0 0 0 22 37 L22 34 L25 31 L28 33 A10 10 0 0 0 30 29 L27 27 L27 24 L30 22 A10 10 0 0 0 28 18 L26 20 L24 17 L25 14 A10 10 0 0 0 21 12 L20 15 L18 15 A5 5 0 0 0 15 10 Z" fill="#1A1D24" stroke="currentColor" strokeWidth="2" className="text-white" />
-                            <circle cx="15" cy="26" r="4" fill="none" stroke="currentColor" strokeWidth="2" className="text-white" />
+                    <defs>
+                        <g id="ticket-doodle">
+                            {/* Ticket Body */}
+                            <path d="M20 40 H80 A5 5 0 0 1 85 45 V55 A5 5 0 0 0 85 65 V75 A5 5 0 0 1 80 80 H20 A5 5 0 0 1 15 75 V65 A5 5 0 0 0 15 55 V45 A5 5 0 0 1 20 40 Z" fill="none" stroke="currentColor" strokeWidth="0.8" className="text-white" />
+                            {/* Perforation Line */}
+                            <path d="M35 40 V80" fill="none" stroke="currentColor" strokeWidth="0.8" strokeDasharray="3 3" className="text-white" />
+                            {/* Content Lines */}
+                            <path d="M45 50 H75 M45 60 H70 M45 70 H65" fill="none" stroke="currentColor" strokeWidth="0.8" className="text-white" />
+                            {/* Gear Icon - Top Right Overlay */}
+                            <g transform="translate(75, 30) scale(0.6)">
+                                <path d="M15 10 A5 5 0 0 0 10 15 L8 15 L7 12 A10 10 0 0 0 3 14 L4 17 L2 20 L0 18 A10 10 0 0 0 0 22 L3 24 L3 27 L0 29 A10 10 0 0 0 2 33 L5 31 L8 34 L8 37 A5 5 0 0 0 10 42 L20 42 A5 5 0 0 0 22 37 L22 34 L25 31 L28 33 A10 10 0 0 0 30 29 L27 27 L27 24 L30 22 A10 10 0 0 0 28 18 L26 20 L24 17 L25 14 A10 10 0 0 0 21 12 L20 15 L18 15 A5 5 0 0 0 15 10 Z" fill="#1A1D24" stroke="currentColor" strokeWidth="2" className="text-white" />
+                                <circle cx="15" cy="26" r="4" fill="none" stroke="currentColor" strokeWidth="2" className="text-white" />
+                            </g>
                         </g>
+                    </defs>
+
+                    <pattern id="global-ticket-pattern" x="0" y="0" width="320" height="320" patternUnits="userSpaceOnUse" patternTransform="translate(0,0)">
+                        <animateTransform attributeName="patternTransform" type="translate" from="0 0" to="0 -320" dur="20s" repeatCount="indefinite" />
+
+                        {/* Randomly placed tickets - Moved away from edges to prevent clipping */}
+                        <use href="#ticket-doodle" transform="translate(100, 40) rotate(-15 50 60)" />
+                        <use href="#ticket-doodle" transform="translate(250, 80) rotate(10 50 60)" />
+                        <use href="#ticket-doodle" transform="translate(50, 180) rotate(20 50 60)" />
+                        <use href="#ticket-doodle" transform="translate(200, 240) rotate(-5 50 60)" />
+                        <use href="#ticket-doodle" transform="translate(120, 300) rotate(5 50 60)" />
                     </pattern>
                     <rect width="100%" height="100%" fill="url(#global-ticket-pattern)" />
                 </svg>
