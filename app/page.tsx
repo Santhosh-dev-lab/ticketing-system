@@ -39,17 +39,22 @@ export default async function Index() {
               <div className="flex items-center gap-3">
                 <span className="text-sm text-white/60">Hey, {user.user_metadata.full_name || user.email}</span>
                 <form action={signout}>
-                  <LogoutButton />
+                  <button
+                    type="submit"
+                    className="group flex p-2 rounded-full border border-white/10 bg-white/5 hover:bg-red-500/20 hover:border-red-500/50 transition-all text-white/60 hover:text-red-400"
+                    title="Log Out"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                  </button>
                 </form>
               </div>
             ) : (
-              <Link href="/login" className="px-5 py-2 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all text-sm font-medium">
-                Log in
+              <Link href="/login" className="px-5 py-2 rounded-full bg-white text-black hover:bg-gray-200 transition-all text-sm font-medium">
+                Client Login
               </Link>
             )}
-            <Link href={user ? "#" : "/signup"} className="px-5 py-2 rounded-full bg-white text-black hover:bg-gray-200 transition-all text-sm font-medium">
-              Get started
-            </Link>
           </div>
         </div>
       </nav>
@@ -79,31 +84,25 @@ export default async function Index() {
           <div className="relative z-20 mb-8 animate-fade-up opacity-0" style={{ animationDelay: '0.1s' }}>
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs font-medium text-white/80">
               <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-              Now powering 10,000+ support teams
+              Client Portal Access
             </span>
           </div>
 
           <h1 className="relative z-20 max-w-4xl text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6 leading-tight animate-fade-up opacity-0" style={{ animationDelay: '0.2s' }}>
-            Customer support <br className="hidden md:block" />
-            that <span className="italic font-serif font-light text-white/90">feels</span> human.
+            Premium Support <br className="hidden md:block" />
+            for <span className="italic font-serif font-light text-white/90">Exclusive</span> Clients.
           </h1>
 
           <p className="relative z-20 max-w-xl text-lg md:text-xl text-white/60 mb-10 leading-relaxed animate-fade-up opacity-0" style={{ animationDelay: '0.4s' }}>
-            Automate inquiries, organize tickets, and delight customers with an AI-first support platform designed for speed.
+            Login to your dedicated dashboard to raise tickets, track progress, and communicate with our team.
           </p>
 
           <div className="relative z-20 flex flex-col sm:flex-row items-center gap-4 animate-fade-up opacity-0" style={{ animationDelay: '0.6s' }}>
             <Link
-              href="/signup"
+              href="/login"
               className="h-12 px-8 rounded-full bg-white text-black font-semibold flex items-center justify-center hover:bg-gray-200 transition-all hover:scale-105"
             >
-              Get started
-            </Link>
-            <Link
-              href="#"
-              className="h-12 px-8 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-white font-medium flex items-center justify-center hover:bg-white/10 transition-all"
-            >
-              Learn more
+              Client Login
             </Link>
           </div>
         </section>

@@ -34,7 +34,7 @@ export async function createTicket(prevState: any, formData: FormData) {
 
     if (error) {
         console.error('Ticket creation error:', error)
-        return { error: 'Failed to create ticket' }
+        return { error: error.message }
     }
 
     revalidatePath('/dashboard')
