@@ -15,6 +15,10 @@ export type Ticket = {
     created_at: string
     customer_id: string
     readable_id: number
+    assigned_agent?: {
+        full_name: string
+        email: string
+    }
 }
 
 export default function TicketList({ initialTickets = [] }: { initialTickets: Ticket[] }) {
@@ -69,107 +73,174 @@ export default function TicketList({ initialTickets = [] }: { initialTickets: Ti
         return matchesFilter && matchesSearch
     })
 
+    // Stats Calculation
+    const total = tickets.length
+    const open = tickets.filter(t => t.status === 'open').length
+    const inProgress = tickets.filter(t => t.status === 'in_progress').length
+    const resolved = tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length
+
     return (
-        <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0a0a0a] rounded-xl border border-white/5 shadow-2xl">
-            {/* Header / Controls */}
-            <div className="p-6 border-b border-white/5 space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-lg font-semibold text-white">All Tickets</h2>
-                        <p className="text-xs text-white/40 mt-1">Manage and track your support requests.</p>
-                    </div>
-                    <div className="flex gap-3">
-                        <Link href="/dashboard/new" className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-500 transition-all shadow-[0_0_20px_-5px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_-5px_rgba(37,99,235,0.5)] flex items-center gap-2">
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path></svg>
-                            New Ticket
-                        </Link>
-                    </div>
-                </div>
+        <div className="bg-[#1A1D24] border border-white/5 rounded-2xl overflow-hidden flex flex-col shadow-xl">
+            {/* Toolbar */}
+            <div className="p-6 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <h2 className="text-lg font-bold text-white tracking-tight">All Tickets</h2>
 
-                {/* Filter Tabs & Search */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-1 bg-white/5 p-1 rounded-lg self-start">
-                        {['all', 'open', 'resolved'].map((status) => (
-                            <button
-                                key={status}
-                                onClick={() => setFilter(status)}
-                                className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${filter === status ? 'bg-white/10 text-white shadow-sm' : 'text-white/40 hover:text-white/70 hover:bg-white/5'
-                                    } capitalize`}
-                            >
-                                {status === 'all' ? 'All Tickets' : status}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="relative group">
-                        <input
-                            type="text"
-                            placeholder="Search tickets..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="bg-[#0F1219] border border-white/10 rounded-lg py-2 pl-10 pr-4 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 focus:bg-white/5 transition-all w-full md:w-64"
-                        />
-                        <svg className="w-4 h-4 text-white/30 absolute left-3 top-2.5 group-focus-within:text-white/60 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
+                <div className="flex items-center gap-3">
+                    <Link href="/dashboard/new" className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-all shadow-lg flex items-center gap-2">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4"></path></svg>
+                        Create Ticket
+                    </Link>
                 </div>
             </div>
 
-            {/* Canvas / Table Area */}
-            <div className="flex-1 overflow-auto">
+            {/* Filters */}
+            <div className="p-4 bg-[#15181E] border-b border-white/5 flex items-center gap-4 overflow-x-auto">
+                {/* Search */}
+                <div className="relative group flex-1 max-w-md">
+                    <input
+                        type="text"
+                        placeholder="Search ticket..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full bg-[#0B0E14] border border-white/10 rounded-lg py-2 pl-10 pr-4 text-xs font-medium text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 transition-all"
+                    />
+                    <svg className="w-4 h-4 text-white/30 absolute left-3 top-2.5 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+
+                {/* Filter Dropdowns (Visual Only for now, mapped to existing filter logic) */}
+                <select
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    className="bg-[#0B0E14] border border-white/10 text-white/70 text-xs font-medium rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/50 cursor-pointer"
+                >
+                    <option value="all">Status: All</option>
+                    <option value="open">Status: Open</option>
+                    <option value="resolved">Status: Resolved</option>
+                </select>
+
+                <div className="bg-[#0B0E14] border border-white/10 text-white/70 text-xs font-medium rounded-lg px-3 py-2 cursor-pointer flex items-center gap-2 hover:border-white/20 transition-all">
+                    <span>Priority</span>
+                    <svg className="w-3 h-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+
+                <div className="bg-[#0B0E14] border border-white/10 text-white/70 text-xs font-medium rounded-lg px-3 py-2 cursor-pointer flex items-center gap-2 hover:border-white/20 transition-all">
+                    <span>Assigned To</span>
+                    <svg className="w-3 h-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+
+                <div className="flex items-center gap-1 ml-auto">
+                    <button className="p-2 bg-blue-600 text-white rounded-lg shadow-lg">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <button className="p-2 text-white/40 hover:text-white transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                    <thead className="bg-[#0a0a0a] sticky top-0 z-10">
+                    <thead className="bg-[#15181E] border-b border-white/5">
                         <tr>
-                            <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5">Ticket ID</th>
-                            <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5">Subject</th>
-                            <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5">Status</th>
-                            <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5">Priority</th>
-                            <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5">Department</th>
-                            <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 text-right">Last Updated</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-white/40 uppercase tracking-wider">Ticket ID</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-white/40 uppercase tracking-wider">Subject</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-white/40 uppercase tracking-wider">Category</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-white/40 uppercase tracking-wider">Status</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-white/40 uppercase tracking-wider">Priority</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-white/40 uppercase tracking-wider">Assigned To</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-white/40 uppercase tracking-wider">Date</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-white/40 uppercase tracking-wider text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/[0.03]">
-                        {filteredTickets.length === 0 ? (
-                            <tr>
-                                <td colSpan={6} className="py-20 text-center">
-                                    <div className="flex flex-col items-center justify-center gap-3">
-                                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white/20">
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <tbody className="divide-y divide-white/5">
+                        {filteredTickets.map((ticket) => (
+                            <tr key={ticket.id} className="group hover:bg-white/[0.02] transition-colors cursor-pointer">
+                                <td className="py-4 px-6">
+                                    <span className="text-xs font-bold text-white/70">#{ticket.readable_id || ticket.id}</span>
+                                </td>
+                                <td className="py-4 px-6 max-w-xs">
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors mb-0.5">{ticket.title}</span>
+                                        <span className="text-[11px] text-white/40 truncate">{ticket.description}</span>
+                                    </div>
+                                </td>
+                                <td className="py-4 px-6">
+                                    <span className="text-xs font-medium text-white/60">{ticket.department || 'General'}</span>
+                                </td>
+                                <td className="py-4 px-6">
+                                    <StatusBadge status={ticket.status} />
+                                </td>
+                                <td className="py-4 px-6">
+                                    <PriorityBadge priority={ticket.priority} />
+                                </td>
+                                <td className="py-4 px-6">
+                                    {ticket.assigned_agent ? (
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ring-2 ring-[#1A1D24]">
+                                                {ticket.assigned_agent.full_name?.charAt(0).toUpperCase() || 'A'}
+                                            </div>
+                                            <span className="text-xs font-medium text-white/80">{ticket.assigned_agent.full_name}</span>
                                         </div>
-                                        <p className="text-white/30 text-xs">No tickets found matching your criteria.</p>
+                                    ) : (
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+                                                <svg className="w-4 h-4 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                            </div>
+                                            <span className="text-xs font-medium text-white/30 italic">Unassigned</span>
+                                        </div>
+                                    )}
+                                </td>
+                                <td className="py-4 px-6">
+                                    <span className="text-xs font-medium text-white/60">
+                                        {new Date(ticket.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    </span>
+                                </td>
+                                <td className="py-4 px-6 text-right">
+                                    <div className="flex items-center justify-end gap-2 text-white/40">
+                                        <button className="p-1.5 hover:text-blue-400 hover:bg-blue-400/10 rounded-md transition-all">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        </button>
+                                        <button className="p-1.5 hover:text-emerald-400 hover:bg-emerald-400/10 rounded-md transition-all">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        </button>
+                                        <button className="p-1.5 hover:text-red-400 hover:bg-red-400/10 rounded-md transition-all">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
-                        ) : (
-                            filteredTickets.map((ticket) => (
-                                <tr key={ticket.id} className="group hover:bg-white/[0.02] transition-all cursor-pointer">
-                                    <td className="py-4 px-6">
-                                        <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-white/5 border border-white/5 text-[10px] font-mono font-medium text-white/70 group-hover:bg-white/10 group-hover:text-white transition-colors">
-                                            #{ticket.readable_id || ticket.id}
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-medium text-white/90 group-hover:text-white transition-colors mb-1">{ticket.title}</span>
-                                            <span className="text-[11px] text-white/40 line-clamp-1 max-w-[300px]">{ticket.description}</span>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <StatusBadge status={ticket.status} />
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <PriorityBadge priority={ticket.priority} />
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <span className="text-xs text-white/50 bg-white/5 px-2 py-1 rounded-md border border-white/5">{ticket.department}</span>
-                                    </td>
-                                    <td className="py-4 px-6 text-right text-xs text-white/30 font-mono">
-                                        {new Date(ticket.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                    </td>
-                                </tr>
-                            ))
-                        )}
+                        ))}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Pagination */}
+            <div className="p-4 border-t border-white/5 flex items-center justify-between">
+                <button className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white/50 hover:text-white transition-colors">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
+                    Previous
+                </button>
+
+                <div className="flex items-center gap-2">
+                    {[1, 2, 3].map((page) => (
+                        <button key={page} className={`w-8 h-8 rounded-lg text-xs font-bold flex items-center justify-center transition-all ${page === 1 ? 'bg-blue-600 text-white shadow-lg' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}>
+                            {page}
+                        </button>
+                    ))}
+                    <span className="text-white/30 text-xs">...</span>
+                    <button className="w-8 h-8 rounded-lg text-xs font-bold flex items-center justify-center text-white/40 hover:bg-white/5 hover:text-white transition-all">
+                        8
+                    </button>
+                    <button className="w-8 h-8 rounded-lg text-xs font-bold flex items-center justify-center text-white/40 hover:bg-white/5 hover:text-white transition-all">
+                        9
+                    </button>
+                </div>
+
+                <button className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white/50 hover:text-white transition-colors">
+                    Next
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
             </div>
         </div>
     )
@@ -177,10 +248,16 @@ export default function TicketList({ initialTickets = [] }: { initialTickets: Ti
 
 function StatusBadge({ status }: { status: string }) {
     const styles = {
-        open: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-        in_progress: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-        resolved: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-        closed: "bg-gray-500/10 text-gray-400 border-gray-500/20",
+        open: "bg-[#0d1424] text-blue-400 border-blue-500/20",
+        in_progress: "bg-[#1a120b] text-orange-400 border-orange-500/20",
+        resolved: "bg-[#0b1a15] text-emerald-400 border-emerald-500/20",
+        closed: "bg-[#111] text-gray-400 border-gray-500/20",
+    }
+    const dots = {
+        open: "bg-blue-500 shadow-[0_0_10px_-2px_rgba(59,130,246,0.5)]",
+        in_progress: "bg-orange-500 shadow-[0_0_10px_-2px_rgba(249,115,22,0.5)]",
+        resolved: "bg-emerald-500 shadow-[0_0_10px_-2px_rgba(16,185,129,0.5)]",
+        closed: "bg-gray-500",
     }
     const labels = {
         open: "Open",
@@ -190,31 +267,23 @@ function StatusBadge({ status }: { status: string }) {
     }
 
     return (
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium border ${styles[status as keyof typeof styles] || styles.closed}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${status === 'open' ? 'bg-blue-400' : status === 'in_progress' ? 'bg-orange-400' : status === 'resolved' ? 'bg-emerald-400' : 'bg-gray-400'}`}></span>
+        <span className={`inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${styles[status as keyof typeof styles] || styles.closed}`}>
             {labels[status as keyof typeof labels] || status}
         </span>
     )
 }
 
 function PriorityBadge({ priority }: { priority: string }) {
-    const icons = {
-        urgent: <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>,
-        high: <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>,
-        medium: <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" /></svg>,
-        low: <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>,
-    }
     const styles = {
-        urgent: "text-red-400 bg-red-500/10 border-red-500/20",
-        high: "text-orange-400 bg-orange-500/10 border-orange-500/20",
-        medium: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
-        low: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+        urgent: "bg-red-500/10 text-red-400 border border-red-500/20",
+        high: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
+        medium: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20",
+        low: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
     }
 
     return (
-        <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-medium border ${styles[priority as keyof typeof styles] || styles.low}`}>
-            {icons[priority as keyof typeof styles]}
-            <span className="uppercase tracking-wide">{priority}</span>
+        <span className={`inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${styles[priority as keyof typeof styles] || styles.low}`}>
+            {priority}
         </span>
     )
 }
