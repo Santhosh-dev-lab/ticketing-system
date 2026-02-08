@@ -260,3 +260,5 @@ h5,
 h6 {
   @apply tracking-tight font-bold;
 }
+
+@layer utilities {}
