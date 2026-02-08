@@ -37,6 +37,9 @@ export default async function Index() {
           <div className="flex items-center gap-4">
             {user ? (
               <div className="flex items-center gap-3">
+                <Link href="/dashboard" className="text-sm font-medium text-white hover:text-blue-400 transition-colors mr-2">
+                  Dashboard
+                </Link>
                 <span className="text-sm text-white/60">Hey, {user.user_metadata.full_name || user.email}</span>
                 <form action={signout}>
                   <button
