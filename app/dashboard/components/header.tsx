@@ -2,6 +2,8 @@
 
 import { createClient } from '@/utils/supabase/client'
 import { useEffect, useState } from 'react'
+import { signout } from '@/app/login/actions'
+import LogoutButton from '@/components/LogoutButton'
 
 export default function Header({ title }: { title: string }) {
     const [user, setUser] = useState<any>(null)
@@ -34,6 +36,10 @@ export default function Header({ title }: { title: string }) {
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-sm font-bold text-white shadow-lg ring-2 ring-white/5">
                     {user?.full_name?.charAt(0).toUpperCase() || 'U'}
                 </div>
+
+                <form action={signout}>
+                    <LogoutButton />
+                </form>
             </div>
         </header>
     )

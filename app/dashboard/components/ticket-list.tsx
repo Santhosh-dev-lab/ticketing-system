@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export type Ticket = {
-    id: number
+    id: string
     title: string
     description: string
     status: 'open' | 'in_progress' | 'resolved' | 'closed'

@@ -54,7 +54,29 @@ export async function updateSession(request: NextRequest) {
         }
     )
 
-    await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (user) {
+        // Fetch user role
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single()
+
+        const role = profile?.role || 'customer'
+        const path = request.nextUrl.pathname
+
+        // 1. Protect Agent Routes
+        if (path.startsWith('/dashboard/agent') && role !== 'agent' && role !== 'admin') {
+            return NextResponse.redirect(new URL('/dashboard', request.url))
+        }
+
+        // 2. Redirect Agents to their dashboard if they hit the main dashboard
+        if (path === '/dashboard' && (role === 'agent' || role === 'admin')) {
+            return NextResponse.redirect(new URL('/dashboard/agent', request.url))
+        }
+    }
 
     return response
 }
