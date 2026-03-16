@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
 
@@ -30,25 +30,26 @@ serve(async (req) => {
        return new Response(JSON.stringify({ message: "No expertise text to embed" }), { status: 200 })
     }
 
-    // 2. Generate embedding via OpenAI
-    const embeddingResponse = await fetch("https://api.openai.com/v1/embeddings", {
+    // 2. Generate embedding via Gemini
+    const embeddingResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "text-embedding-3-small",
-        input: profile.expertise,
+        model: "models/text-embedding-004",
+        content: {
+          parts: [{ text: profile.expertise }]
+        }
       }),
     })
 
     const embeddingData = await embeddingResponse.json()
-    if (embeddingData.error) {
-      throw new Error(`OpenAI Error: ${embeddingData.error.message}`)
+    if (!embeddingResponse.ok) {
+      throw new Error(`Gemini Error: ${JSON.stringify(embeddingData.error)}`)
     }
 
-    const embedding = embeddingData.data[0].embedding
+    const embedding = embeddingData.embedding.values
 
     // 3. Save embedding to profile
     const { error: updateError } = await supabase

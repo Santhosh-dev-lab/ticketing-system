@@ -8,12 +8,12 @@ create extension if not exists vector;
 -- Add expertise text and its embedding
 alter table profiles 
 add column if not exists expertise text,
-add column if not exists expertise_embedding vector(1536);
+add column if not exists expertise_embedding vector(768);
 
 -- 3. Modify Tickets Table
 -- Add semantic embedding for ticket content
 alter table tickets
-add column if not exists semantic_embedding vector(1536);
+add column if not exists semantic_embedding vector(768);
 
 -- 4. Disable Old Round-Robin Trigger
 -- We will handle assignment via Edge Function or App Logic now.
@@ -22,7 +22,7 @@ drop trigger if exists trigger_auto_assign_ticket on tickets;
 -- 5. Helper Function for Vector Search
 -- This searches for agents based on semantic similarity to a ticket embedding
 create or replace function match_agents (
-  query_embedding vector(1536),
+  query_embedding vector(768),
   match_threshold float,
   match_count int,
   target_department text default null
