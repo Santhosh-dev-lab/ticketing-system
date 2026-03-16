@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function updateExpertise(expertise: string) {
+export async function updateExpertise(expertise: string, department: string) {
     const supabase = await createClient()
 
     const {
@@ -16,7 +16,7 @@ export async function updateExpertise(expertise: string) {
 
     const { error } = await supabase
         .from('profiles')
-        .update({ expertise })
+        .update({ expertise, department })
         .eq('id', user.id)
 
     if (error) {

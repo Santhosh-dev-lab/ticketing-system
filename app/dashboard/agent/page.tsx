@@ -14,7 +14,7 @@ export default async function AgentDashboard() {
     // Fetch agent profile
     const { data: profile } = await supabase
         .from('profiles')
-        .select('expertise')
+        .select('expertise, department')
         .eq('id', user?.id)
         .single()
 
@@ -64,7 +64,10 @@ export default async function AgentDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-6">
-                        <ExpertiseSettings initialExpertise={(profile?.expertise as string) || ''} />
+                        <ExpertiseSettings 
+                            initialExpertise={(profile?.expertise as string) || ''} 
+                            initialDepartment={(profile?.department as string) || 'General'}
+                        />
                         
                         {/* Quick Stats or Tips could go here */}
                         <div className="bg-[#1A1D24] border border-white/5 rounded-xl p-6">

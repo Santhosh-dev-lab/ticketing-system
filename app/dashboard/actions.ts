@@ -16,19 +16,15 @@ export async function createTicket(prevState: any, formData: FormData) {
     }
 
     const title = formData.get('title') as string
-    const department = formData.get('department') as string
-    const priority = formData.get('priority') as string
     const description = formData.get('description') as string
 
-    if (!title || !description || !department) {
+    if (!title || !description) {
         return { error: 'Please fill in all required fields' }
     }
 
     const { data: ticket, error } = await supabase.from('tickets').insert({
         title,
         description,
-        department,
-        priority,
         customer_id: user.id
     }).select('id').single()
 

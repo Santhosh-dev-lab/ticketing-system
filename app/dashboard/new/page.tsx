@@ -100,30 +100,8 @@ export default function NewTicketPage() {
                                 />
                             </div>
 
-                            {/* Row: Department & Priority */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 z-20 relative">
-                                <CustomSelect
-                                    label="Department"
-                                    name="department"
-                                    options={[
-                                        { value: 'General', label: 'General Inquiry' },
-                                        { value: 'Technical Support', label: 'Technical Support' },
-                                        { value: 'Billing', label: 'Billing & Account' },
-                                        { value: 'Feature Request', label: 'Feature Request' },
-                                    ]}
-                                />
-
-                                <CustomSelect
-                                    label="Priority Level"
-                                    name="priority"
-                                    options={[
-                                        { value: 'low', label: 'Low - General Question' },
-                                        { value: 'medium', label: 'Medium - Standard Issue' },
-                                        { value: 'high', label: 'High - Functionality Impaired' },
-                                        { value: 'urgent', label: 'Urgent - Critical Blocker' },
-                                    ]}
-                                />
-                            </div>
+                            {/* Row: Department & Priority (Removed for AI Automation) */}
+                            {/* The AI determines these automatically now */}
 
                             {/* Description */}
                             <div className="space-y-1.5 z-0">

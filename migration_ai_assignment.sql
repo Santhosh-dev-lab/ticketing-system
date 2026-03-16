@@ -6,14 +6,25 @@ create extension if not exists vector;
 
 -- 2. Modify Profiles Table
 -- Add expertise text and its embedding
+-- Drop if exists to handle dimension changes (1536 -> 768)
+alter table profiles drop column if exists expertise;
+alter table profiles drop column if exists expertise_embedding;
+alter table profiles drop column if exists department cascade;
+
 alter table profiles 
-add column if not exists expertise text,
-add column if not exists expertise_embedding vector(768);
+add column expertise text,
+add column expertise_embedding vector(768),
+add column department text;
 
 -- 3. Modify Tickets Table
 -- Add semantic embedding for ticket content
+alter table tickets drop column if exists semantic_embedding;
+alter table tickets drop column if exists department;
+
 alter table tickets
-add column if not exists semantic_embedding vector(768);
+add column semantic_embedding vector(768),
+add column department text,
+alter column priority drop not null;
 
 -- 4. Disable Old Round-Robin Trigger
 -- We will handle assignment via Edge Function or App Logic now.

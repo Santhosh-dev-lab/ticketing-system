@@ -23,7 +23,7 @@ serve(async (req) => {
     // 1. Fetch ticket details
     const { data: ticket, error: fetchError } = await supabase
       .from("tickets")
-      .select("title, description, department")
+      .select("title, description")
       .eq("id", ticket_id)
       .single()
 
@@ -32,47 +32,86 @@ serve(async (req) => {
     }
 
     const content = `${ticket.title}\n${ticket.description}`
-    console.log('Generating embedding for content length:', content.length)
-
+    
     if (!GEMINI_API_KEY) {
       console.error('Error: GEMINI_API_KEY is not set')
       throw new Error('GEMINI_API_KEY is missing from environment variables')
     }
 
-    // 2. Generate embedding via Gemini
-    const embeddingResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${GEMINI_API_KEY}`, {
+    // 2. Determine Department and Priority via Gemini Classify
+    console.log('Classifying ticket department and priority...')
+    const classificationResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "models/text-embedding-004",
+        contents: [{
+          parts: [{
+            text: `Classify the following support ticket into a department and priority level.
+            Departments: "General", "Technical Support", "Billing", "Feature Request"
+            Priorities: "low", "medium", "high", "urgent"
+            
+            Ticket Title: ${ticket.title}
+            Ticket Description: ${ticket.description}
+            
+            Return JSON only in this format: {"department": "...", "priority": "..."}`
+          }]
+        }],
+        generationConfig: {
+            response_mime_type: "application/json",
+        }
+      }),
+    })
+
+    const classificationData = await classificationResponse.json()
+    if (!classificationResponse.ok) {
+        throw new Error(`Gemini Classification Error: ${JSON.stringify(classificationData.error)}`)
+    }
+
+    const { department, priority } = JSON.parse(classificationData.candidates[0].content.parts[0].text)
+    console.log(`AI Classification -> Department: ${department}, Priority: ${priority}`)
+
+    // 3. Generate embedding via Gemini (gemini-embedding-001)
+    console.log('Generating embedding for content...')
+    const embeddingResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "models/gemini-embedding-001",
         content: {
           parts: [{ text: content }]
-        }
+        },
+        output_dimensionality: 768
       }),
     })
 
     const embeddingData = await embeddingResponse.json()
     if (!embeddingResponse.ok) {
-        throw new Error(`Gemini Error: ${JSON.stringify(embeddingData.error)}`)
+        throw new Error(`Gemini Embedding Error: ${JSON.stringify(embeddingData.error)}`)
     }
 
     const embedding = embeddingData.embedding.values
 
-    console.log('Saving embedding to ticket...')
+    console.log('Updating ticket with AI findings...')
     await supabase
       .from("tickets")
-      .update({ semantic_embedding: embedding })
+      .update({ 
+        semantic_embedding: embedding,
+        department: department,
+        priority: priority
+      })
       .eq("id", ticket_id)
 
-    console.log('Querying for best matching agent in department:', ticket.department)
-    // 4. Match agents using the RPC function (updated for 768 dimensions)
+    console.log('Querying for best matching agent in department:', department)
+    // 4. Match agents using the RPC function
     const { data: matchedAgents, error: matchError } = await supabase.rpc("match_agents", {
       query_embedding: embedding,
-      match_threshold: 0.1, 
+      match_threshold: 0.05, // Lowered threshold for better testing
       match_count: 1,
-      target_department: ticket.department
+      target_department: department
     })
 
     if (matchError) {
@@ -80,7 +119,8 @@ serve(async (req) => {
     }
 
     if (!matchedAgents || matchedAgents.length === 0) {
-       return new Response(JSON.stringify({ message: "No matching agent found" }), { status: 200 })
+       console.log('No matching agent found in department. Ticket remains unassigned.')
+       return new Response(JSON.stringify({ message: "No matching agent found", department, priority }), { status: 200 })
     }
 
     const bestAgent = matchedAgents[0]
@@ -101,6 +141,8 @@ serve(async (req) => {
       success: true, 
       assigned_to: bestAgent.id,
       agent_name: bestAgent.full_name,
+      department,
+      priority,
       similarity: bestAgent.similarity
     }), { 
       headers: { "Content-Type": "application/json" },
