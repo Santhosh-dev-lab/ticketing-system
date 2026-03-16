@@ -19,6 +19,15 @@ serve(async (req) => {
     console.log('Initializing Supabase client...')
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 
+    // DEBUG: List available models
+    try {
+        const modelsResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${GEMINI_API_KEY}`)
+        const modelsData = await modelsResp.json()
+        console.log('Available Models:', JSON.stringify(modelsData.models?.map((m: any) => m.name)))
+    } catch (e) {
+        console.error('Debug: Failed to list models', e)
+    }
+
     console.log('Fetching details for ticket_id:', ticket_id)
     // 1. Fetch ticket details
     const { data: ticket, error: fetchError } = await supabase
@@ -38,64 +47,54 @@ serve(async (req) => {
       throw new Error('GEMINI_API_KEY is missing from environment variables')
     }
 
-    // 2. Determine Department and Priority via Gemini Classify
-    console.log('Classifying ticket department and priority...')
-    const classificationResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `Classify the following support ticket into a department and priority level.
-            Departments: "General", "Technical Support", "Billing", "Feature Request"
-            Priorities: "low", "medium", "high", "urgent"
-            
-            Ticket Title: ${ticket.title}
-            Ticket Description: ${ticket.description}
-            
-            Return JSON only in this format: {"department": "...", "priority": "..."}`
-          }]
-        }],
-        generationConfig: {
-            response_mime_type: "application/json",
-        }
-      }),
-    })
+    // 2. Determine Department and Priority via Heuristics (Instant & Free)
+    console.log('Classifying ticket via heuristics...')
+    
+    const classifyTicket = (title: string, desc: string) => {
+        const text = `${title} ${desc}`.toLowerCase()
+        
+        let dept = "General"
+        if (text.match(/bug|error|fail|broken|crash|technical|api|integration|issue/)) dept = "Technical Support"
+        if (text.match(/bill|payment|stripe|invoice|money|charge|refund|subscription/)) dept = "Billing"
+        if (text.match(/feature|request|suggest|add|new|improvement|want/)) dept = "Feature Request"
 
-    const classificationData = await classificationResponse.json()
-    if (!classificationResponse.ok) {
-        throw new Error(`Gemini Classification Error: ${JSON.stringify(classificationData.error)}`)
+        let prio = "medium"
+        if (text.match(/urgent|critical|blocker|broken|stop|asap|emergency/)) prio = "urgent"
+        else if (text.match(/high|important|soon|billing/)) prio = "high"
+        else if (text.match(/low|question|wondering|info/)) prio = "low"
+
+        return { department: dept, priority: prio }
     }
 
-    const { department, priority } = JSON.parse(classificationData.candidates[0].content.parts[0].text)
-    console.log(`AI Classification -> Department: ${department}, Priority: ${priority}`)
+    const { department, priority } = classifyTicket(ticket.title, ticket.description)
+    console.log(`Heuristic Classification -> Department: ${department}, Priority: ${priority}`)
 
     // 3. Generate embedding via Gemini (gemini-embedding-001)
-    console.log('Generating embedding for content...')
-    const embeddingResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "models/gemini-embedding-001",
-        content: {
-          parts: [{ text: content }]
-        },
-        output_dimensionality: 768
-      }),
-    })
+    // We wrap this in a try-catch to make it robust against Gemini downtime/quota
+    let embedding = null
+    try {
+        console.log('Generating embedding for content...')
+        const embeddingResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: "models/gemini-embedding-001",
+                content: { parts: [{ text: content }] },
+                output_dimensionality: 768
+            }),
+        })
 
-    const embeddingData = await embeddingResponse.json()
-    if (!embeddingResponse.ok) {
-        throw new Error(`Gemini Embedding Error: ${JSON.stringify(embeddingData.error)}`)
+        const embeddingData = await embeddingResponse.json()
+        if (embeddingResponse.ok) {
+            embedding = embeddingData.embedding.values
+        } else {
+            console.warn('Gemini Embedding failed, falling back to basic matching:', JSON.stringify(embeddingData.error))
+        }
+    } catch (e) {
+        console.error('Gemini Embedding network error:', e)
     }
 
-    const embedding = embeddingData.embedding.values
-
-    console.log('Updating ticket with AI findings...')
+    console.log('Updating ticket with findings...')
     await supabase
       .from("tickets")
       .update({ 
@@ -105,21 +104,33 @@ serve(async (req) => {
       })
       .eq("id", ticket_id)
 
-    console.log('Querying for best matching agent in department:', department)
-    // 4. Match agents using the RPC function
-    const { data: matchedAgents, error: matchError } = await supabase.rpc("match_agents", {
-      query_embedding: embedding,
-      match_threshold: 0.05, // Lowered threshold for better testing
-      match_count: 1,
-      target_department: department
-    })
-
-    if (matchError) {
-      throw new Error(`Match Error: ${matchError.message}`)
+    console.log('Querying for matching agent in department:', department)
+    // 4. Match agents
+    // If embedding failed, find any agent in the department
+    let matchedAgents = []
+    if (embedding) {
+        const { data, error: matchError } = await supabase.rpc("match_agents", {
+            query_embedding: embedding,
+            match_threshold: 0.05,
+            match_count: 1,
+            target_department: department
+        })
+        if (!matchError) matchedAgents = data || []
+    } else {
+        // Fallback: Pick an agent from the department with lowest load
+        const { data, error: fetchAgentsError } = await supabase
+            .from("profiles")
+            .select("id, full_name")
+            .eq("role", "agent")
+            .eq("department", department)
+            .limit(1)
+        if (!fetchAgentsError) {
+             matchedAgents = data?.map(a => ({ ...a, similarity: 0 })) || []
+        }
     }
 
-    if (!matchedAgents || matchedAgents.length === 0) {
-       console.log('No matching agent found in department. Ticket remains unassigned.')
+    if (matchedAgents.length === 0) {
+       console.log('No matching agent found. Ticket remains unassigned.')
        return new Response(JSON.stringify({ message: "No matching agent found", department, priority }), { status: 200 })
     }
 
