@@ -7,14 +7,19 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
 
 serve(async (req) => {
   try {
-    const { agent_id } = await req.json()
+    const body = await req.json()
+    console.log('Received request body:', body)
+    const { agent_id } = body
 
     if (!agent_id) {
+      console.error('Error: agent_id is missing')
       return new Response(JSON.stringify({ error: "agent_id is required" }), { status: 400 })
     }
 
+    console.log('Initializing Supabase client...')
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 
+    console.log('Fetching profile for agent_id:', agent_id)
     // 1. Fetch agent details
     const { data: profile, error: fetchError } = await supabase
       .from("profiles")
@@ -27,7 +32,14 @@ serve(async (req) => {
     }
 
     if (!profile.expertise) {
+       console.log('No expertise text found for agent. Skipping embedding.')
        return new Response(JSON.stringify({ message: "No expertise text to embed" }), { status: 200 })
+    }
+
+    console.log('Generating embedding via Gemini...')
+    if (!GEMINI_API_KEY) {
+      console.error('Error: GEMINI_API_KEY is not set')
+      throw new Error('GEMINI_API_KEY is missing from environment variables')
     }
 
     // 2. Generate embedding via Gemini
@@ -51,15 +63,18 @@ serve(async (req) => {
 
     const embedding = embeddingData.embedding.values
 
-    // 3. Save embedding to profile
+    console.log('Saving embedding to database...')
     const { error: updateError } = await supabase
       .from("profiles")
       .update({ expertise_embedding: embedding })
       .eq("id", agent_id)
 
     if (updateError) {
+      console.error('Database update error:', updateError)
       throw new Error(`Update Error: ${updateError.message}`)
     }
+
+    console.log('Embedding updated successfully!')
 
     return new Response(JSON.stringify({ success: true }), { 
       headers: { "Content-Type": "application/json" },
@@ -67,6 +82,7 @@ serve(async (req) => {
     })
 
   } catch (error) {
+    console.error('Unhandled Function Error:', error)
     return new Response(JSON.stringify({ error: error.message }), { 
       headers: { "Content-Type": "application/json" },
       status: 500 

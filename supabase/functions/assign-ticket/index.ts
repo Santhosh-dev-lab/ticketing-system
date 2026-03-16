@@ -7,14 +7,19 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
 
 serve(async (req) => {
   try {
-    const { ticket_id } = await req.json()
+    const body = await req.json()
+    console.log('Received request body:', body)
+    const { ticket_id } = body
 
     if (!ticket_id) {
+      console.error('Error: ticket_id is missing')
       return new Response(JSON.stringify({ error: "ticket_id is required" }), { status: 400 })
     }
 
+    console.log('Initializing Supabase client...')
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 
+    console.log('Fetching details for ticket_id:', ticket_id)
     // 1. Fetch ticket details
     const { data: ticket, error: fetchError } = await supabase
       .from("tickets")
@@ -27,6 +32,12 @@ serve(async (req) => {
     }
 
     const content = `${ticket.title}\n${ticket.description}`
+    console.log('Generating embedding for content length:', content.length)
+
+    if (!GEMINI_API_KEY) {
+      console.error('Error: GEMINI_API_KEY is not set')
+      throw new Error('GEMINI_API_KEY is missing from environment variables')
+    }
 
     // 2. Generate embedding via Gemini
     const embeddingResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${GEMINI_API_KEY}`, {
@@ -49,12 +60,13 @@ serve(async (req) => {
 
     const embedding = embeddingData.embedding.values
 
-    // 3. Save embedding to ticket
+    console.log('Saving embedding to ticket...')
     await supabase
       .from("tickets")
       .update({ semantic_embedding: embedding })
       .eq("id", ticket_id)
 
+    console.log('Querying for best matching agent in department:', ticket.department)
     // 4. Match agents using the RPC function (updated for 768 dimensions)
     const { data: matchedAgents, error: matchError } = await supabase.rpc("match_agents", {
       query_embedding: embedding,
@@ -72,8 +84,10 @@ serve(async (req) => {
     }
 
     const bestAgent = matchedAgents[0]
+    console.log('Found best agent:', bestAgent.full_name, 'with similarity:', bestAgent.similarity)
 
     // 5. Assign ticket
+    console.log('Assigning ticket to agent...')
     const { error: assignError } = await supabase
       .from("tickets")
       .update({ assigned_to: bestAgent.id, status: 'open' })
@@ -94,6 +108,7 @@ serve(async (req) => {
     })
 
   } catch (error) {
+    console.error('Unhandled Function Error:', error)
     return new Response(JSON.stringify({ error: error.message }), { 
       headers: { "Content-Type": "application/json" },
       status: 500 
