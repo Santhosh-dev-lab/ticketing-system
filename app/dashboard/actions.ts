@@ -39,11 +39,15 @@ export async function createTicket(prevState: any, formData: FormData) {
 
     // Trigger AI Assignment Edge Function
     if (ticket?.id) {
-        // We don't await this to keep the response fast for the user
-        // The assignment happens in the background
-        supabase.functions.invoke('assign-ticket', {
+        const { createServiceRoleClient } = await import('@/utils/supabase/service-role')
+        const adminSupabase = createServiceRoleClient()
+        
+        const { error: invokeError } = await adminSupabase.functions.invoke('assign-ticket', {
             body: { ticket_id: ticket.id }
         })
+        if (invokeError) {
+            console.error('AI Assignment invocation error:', invokeError)
+        }
     }
 
     revalidatePath('/dashboard')

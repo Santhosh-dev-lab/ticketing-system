@@ -25,9 +25,16 @@ export async function updateExpertise(expertise: string) {
     }
 
     // Trigger Edge Function to generate embedding
-    await supabase.functions.invoke('embed-agent', {
+    const { createServiceRoleClient } = await import('@/utils/supabase/service-role')
+    const adminSupabase = createServiceRoleClient()
+
+    const { error: invokeError } = await adminSupabase.functions.invoke('embed-agent', {
         body: { agent_id: user.id }
     })
+    
+    if (invokeError) {
+        console.error('Embed agent invocation error:', invokeError)
+    }
     
     revalidatePath('/dashboard/agent')
     return { success: true }
