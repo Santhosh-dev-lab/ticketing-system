@@ -2,11 +2,21 @@ import { createClient } from '@/utils/supabase/server'
 import Header from '../components/header'
 import TicketFeed from './components/TicketFeed'
 import { Ticket } from '../components/ticket-list'
+import ExpertiseSettings from './components/ExpertiseSettings'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AgentDashboard() {
     const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    // Fetch agent profile
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('expertise')
+        .eq('id', user?.id)
+        .single()
 
     // Fetch ALL tickets for agents
     const { data: tickets } = await supabase
@@ -44,12 +54,26 @@ export default async function AgentDashboard() {
                 </div>
 
                 {/* Main Feed */}
-                <div className="flex flex-col gap-4">
-                    <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        Live Ticket Feed
-                    </h2>
-                    <TicketFeed initialTickets={(tickets as any[]) || []} />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 flex flex-col gap-4">
+                        <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            Live Ticket Feed
+                        </h2>
+                        <TicketFeed initialTickets={(tickets as any[]) || []} />
+                    </div>
+
+                    <div className="flex flex-col gap-6">
+                        <ExpertiseSettings initialExpertise={(profile?.expertise as string) || ''} />
+                        
+                        {/* Quick Stats or Tips could go here */}
+                        <div className="bg-[#1A1D24] border border-white/5 rounded-xl p-6">
+                            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-2">AI Routing Tip</h3>
+                            <p className="text-xs text-white/40 leading-relaxed">
+                                Be specific! Instead of just "Backend", use "Node.js, Postgres optimization, Redis caching". This improves your matching accuracy.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>

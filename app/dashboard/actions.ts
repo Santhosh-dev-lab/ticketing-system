@@ -24,17 +24,26 @@ export async function createTicket(prevState: any, formData: FormData) {
         return { error: 'Please fill in all required fields' }
     }
 
-    const { error } = await supabase.from('tickets').insert({
+    const { data: ticket, error } = await supabase.from('tickets').insert({
         title,
         description,
         department,
         priority,
         customer_id: user.id
-    })
+    }).select('id').single()
 
     if (error) {
         console.error('Ticket creation error:', error)
         return { error: error.message }
+    }
+
+    // Trigger AI Assignment Edge Function
+    if (ticket?.id) {
+        // We don't await this to keep the response fast for the user
+        // The assignment happens in the background
+        supabase.functions.invoke('assign-ticket', {
+            body: { ticket_id: ticket.id }
+        })
     }
 
     revalidatePath('/dashboard')
